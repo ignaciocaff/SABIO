@@ -10,3 +10,14 @@ algo de la herramienta, despues de el INSERT tienen que hacer 2 commit, manuales
 Para loguear y desloguear respectivamente, tambien hice el chequeo si ya esta logueado o deslogueado
 no les permite pegar y les devuelve un mensaje. Que lo puede usar el que haga el login derecho si quiere
 para mostrar en android.
+
+
+Se agrego la obtencion de los codigo de barra, para lograr esto tienen que ejecutar primero los 2 insert en
+la tabla TIPOSCODBARRA, se los dejo por las dudas:
+
+INSERT INTO TIPOSCODBARRA (NUMERO, NOMBRE, DESCRI, LARTOT, UCODPR, LCODPR, UBICAN, LARCAN, UBIPRE, LARPRE, UBIPES, LARPES, UFECEL, LFECEL, UFECVE, LFECVE, UDIGVE, LDIGVE, UNUSER, LNUSER, CANTDECPESO) VALUES (1, 'Friar26', 'Etiqueta Grande Friar', 26, 8, 4, 12, 2, 0, 0, 14, 5, 19, 8, 0, 0, 1, 7, 0, 0, 2);
+
+INSERT INTO TIPOSCODBARRA (NUMERO, NOMBRE, DESCRI, LARTOT, UCODPR, LCODPR, UBICAN, LARCAN, UBIPRE, LARPRE, UBIPES, LARPES, UFECEL, LFECEL, UFECVE, LFECVE, UDIGVE, LDIGVE, UNUSER, LNUSER, CANTDECPESO) VALUES (2, 'EAN13', 'EAN13', 13, 4, 4, 0, 0, 0, 8, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3);
+
+
+Corren la api y pegan a api/codigos/get/Pepito van a obtener un listado de codigos de barra.
