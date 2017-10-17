@@ -1,0 +1,12 @@
+Para que les funcione como de momento no sabemos como lo vamos a implementar tienen que hacer lo siguiente:
+1- Poner la BD "GOLDEN_CL.FDB" en alguna ubicacion del disco que la pueden editar en la clase DbConnection yo elegi "C:/GOLDEN_CL.FDB"
+
+2- Crear en la tabla USECASE dos nuevas entradas, revisen cuales son campos obligatorios y hagan lo minimo
+los valores de CODIGO y NODO son iguales, uno tiene que ser "ANDROIDIN" y el otro "ANDROIDOUT". Por si no conocen
+algo de la herramienta, despues de el INSERT tienen que hacer 2 commit, manuales, suele ser un tick verde arriba en la interfaz (me paso que estuve renegando para lograr commitear).
+
+3- Corren la API, y pegan a api/sesion/login/Juansito y api/sesion/logout/Pepito
+
+Para loguear y desloguear respectivamente, tambien hice el chequeo si ya esta logueado o deslogueado
+no les permite pegar y les devuelve un mensaje. Que lo puede usar el que haga el login derecho si quiere
+para mostrar en android.
