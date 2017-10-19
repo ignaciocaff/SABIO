@@ -169,6 +169,35 @@ namespace RestServiceSabio.Data
             }
             return estado;
         }
+
+        public Usuario obtenerUsuarioCompleto(Usuario user)
+        {
+            
+            try
+            {
+                Usuario usuarioDto = new Usuario();
+                open();
+                String sqlQuery = "SELECT NUMERO, NOMBRE, AREA FROM USUARIOS WHERE LOGIN=@USER_FIELD";
+                FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+                sqlCommand.Parameters.Add("@USER_FIELD", user.loginUsuario);
+                FbDataReader usuarioReader = sqlCommand.ExecuteReader();
+
+                while (usuarioReader.Read())
+                {
+                    usuarioDto.idUsuario = usuarioReader.GetInt32(0);
+                    usuarioDto.nombre = usuarioReader.GetString(1);
+                    usuarioDto.area = usuarioReader.GetInt32(2);
+                    usuarioDto.loginUsuario = user.loginUsuario;
+                }
+                usuarioReader.Close();
+                close();
+                return usuarioDto;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.StackTrace.ToString());
+            }
+        }
     }
 }
 

@@ -10,5 +10,7 @@ namespace RestServiceSabio.Model
         public int idUsuario { get; set; }
         public String loginUsuario { get; set; }
         public int estado { get; set; }
+        public String nombre { get; set; }
+        public int area { get; set; }
     }
 }
