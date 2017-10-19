@@ -21,3 +21,9 @@ INSERT INTO TIPOSCODBARRA (NUMERO, NOMBRE, DESCRI, LARTOT, UCODPR, LCODPR, UBICA
 
 
 Corren la api y pegan a api/codigos/get/Pepito van a obtener un listado de codigos de barra.
+
+
+Se agrego la funcionalidad getComprobantes, para probarlo tienen que ejecutar el script completo que mando jose
+Y pegar a api/comprobantes/get/pepito
+
+Actualiza el estado del picking y si no existe en la tabla picking_user lo crea, con el nro de pick del comprobante y el id de usuario correspondiente al nombre "pepito".
