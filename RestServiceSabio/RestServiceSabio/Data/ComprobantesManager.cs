@@ -42,15 +42,21 @@ namespace RestServiceSabio.Data
 
                     listadoItems.Add(item);
                 }
+                foreach (Item it in listadoItems)
+                {
+                    List<Serial> serialesL = new List<Serial>();
+                    Serial serial = new Serial();
+                    for (int i = 1; i <= it.cantidad; i++)
+                    {
+                        it.seriales = serialesL;
+                        it.seriales.Add(serial);
+                    }
+                }
+
                 comprobante.items = listadoItems;
                 comprobantesReader.Close();
                 close();
             }
-            //if (listadoComprobantes.Count > 0)
-            //{
-            //    registrarPicking(listadoComprobantes);
-            //    modificarEstado(listadoComprobantes);
-            //}
             catch (Exception e)
             {
                 throw new Exception(e.StackTrace.ToString());

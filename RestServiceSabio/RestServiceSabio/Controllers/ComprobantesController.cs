@@ -22,5 +22,11 @@ namespace RestServiceSabio.Controllers
             user = sessionManager.obtenerUsuarioCompleto(user);
             return Ok(comprobantesManager.obtenerComprobante(user));
         }
+
+        [HttpPost("ingresar")]
+        public void Post([FromBody]Comprobante comprobante)
+        {
+
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace RestServiceSabio.Model
         public double kilos { get; set; }
         public double puedePickear { get; set; }
         public double saldo { get; set; }
+        public List<Serial> seriales { get; set; }
     }
 
 }
