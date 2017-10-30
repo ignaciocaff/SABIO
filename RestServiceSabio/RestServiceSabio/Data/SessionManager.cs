@@ -177,7 +177,7 @@ namespace RestServiceSabio.Data
             {
                 Usuario usuarioDto = new Usuario();
                 open();
-                String sqlQuery = "SELECT NUMERO, NOMBRE, AREA FROM USUARIOS WHERE LOGIN=@USER_FIELD";
+                String sqlQuery = "SELECT NUMERO, NOMBRE, AREA, DEPOSI FROM USUARIOS WHERE LOGIN=@USER_FIELD";
                 FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
                 sqlCommand.Parameters.Add("@USER_FIELD", user.loginUsuario);
                 FbDataReader usuarioReader = sqlCommand.ExecuteReader();
@@ -187,6 +187,7 @@ namespace RestServiceSabio.Data
                     usuarioDto.idUsuario = usuarioReader.GetInt32(0);
                     usuarioDto.nombre = usuarioReader.GetString(1);
                     usuarioDto.area = usuarioReader.GetInt32(2);
+                    usuarioDto.deposito = usuarioReader.GetInt32(3);
                     usuarioDto.loginUsuario = user.loginUsuario;
                 }
                 usuarioReader.Close();

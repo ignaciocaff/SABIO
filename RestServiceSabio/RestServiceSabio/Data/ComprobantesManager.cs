@@ -132,5 +132,309 @@ namespace RestServiceSabio.Data
             return actualizado;
         }
 
+        public Boolean guardarStock(Usuario user, Comprobante stock)
+        {
+            int idMovArt = 0, idMovDetArt = 0;
+            Boolean stockCompleto = false;
+            Comprobante stockDto = new Comprobante();
+            List<Item> articulos = new List<Item>();
+            try
+            {
+                stockDto.numeroPick = stock.numeroPick;
+                stockDto.observaciones = stock.observaciones;
+                foreach (Item articuloL in stock.items)
+                {
+                    Item articulo = new Item();
+                    List<Serial> seriales = new List<Serial>();
+                    articulo.descripcion = articuloL.descripcion;
+                    articulo.codigoArticulo = articuloL.codigoArticulo;
+                    articulo.cantidad = articuloL.cantidad;
+                    articulo.kilos = articuloL.kilos;
+                    foreach (Serial serial in articuloL.seriales)
+                    {
+                        Serial s = new Serial();
+                        s.numero = serial.numero;
+                        //Chequeo previo si el serial ya existe en la tabla SERIALES
+                        if (!existeSerial(s.numero))
+                        {
+                            //Insert de los seriales en la BD
+                            insertarSeriales(s.numero, articulo.codigoArticulo);
+                        }
+                        s.idSerial = buscarIdSerial(s.numero);
+                        seriales.Add(s);
+                    }
+                    articulo.seriales = seriales;
+                    articulos.Add(articulo);
+                }
+                stockDto.items = articulos;
+
+                //Asigno el ID del movimiento para usarlo posteriormente en el detalle
+                idMovArt = insertarMovArticulo(user, stockDto.observaciones);
+                if (idMovArt > 0)
+                {
+                    foreach (Item art in stockDto.items)
+                    {
+                        idMovDetArt = insertarDetalleMovArticulo(idMovArt, art);
+                        foreach (Serial s in art.seriales)
+                        {
+                            insertarMovSerialesArt(idMovDetArt, s.idSerial);
+                        }
+                    }
+                }
+                stockCompleto = true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
+            return stockCompleto;
+        }
+        public Boolean insertarSeriales(long serial, String codArt)
+        {
+            try
+            {
+                int id = 0;
+                int proveedor = 0;
+                open();
+                String sqlQuery = "select next value for GEN_SERIALES from RDB$DATABASE";
+                FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+                FbDataReader idReader = sqlCommand.ExecuteReader();
+
+                while (idReader.Read())
+                {
+                    id = idReader.GetInt32(0);
+                }
+                idReader.Close();
+
+                String sqlQueryParam = "select BOOLE1 FROM PARAMETROS where CODIGO='PROVEE'";
+                FbCommand sqlCommandParam = new FbCommand(sqlQueryParam, connection);
+                FbDataReader provedorReader = sqlCommandParam.ExecuteReader();
+
+                while (provedorReader.Read())
+                {
+                    proveedor = provedorReader.GetInt32(0);
+                }
+                provedorReader.Close();
+
+                FbTransaction insertTransaction = connection.BeginTransaction();
+                FbCommand insertCommand = new FbCommand();
+                insertCommand.CommandText = "insert into SERIALES (NUMINT,SERIAL,CODART,PROVEE,GTACOM,GTAVTA) values" +
+                    " (" + id + ",'" + Convert.ToString(serial) + "','" + codArt + "'," + proveedor + "," + 0 + "," + 0 + ")";
+                insertCommand.Connection = connection;
+                insertCommand.Transaction = insertTransaction;
+
+                insertCommand.ExecuteNonQuery();
+                insertTransaction.Commit();
+                insertCommand.Dispose();
+                close();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
+
+        }
+
+        public Boolean existeSerial(long serial)
+        {
+            try
+            {
+                open();
+                String sqlQuery = "SELECT CODART FROM SERIALES WHERE SERIAL=@SERIAL";
+                FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+                sqlCommand.Parameters.Add("@SERIAL", Convert.ToString(serial));
+                FbDataReader serialReader = sqlCommand.ExecuteReader();
+
+                while (serialReader.Read())
+                {
+                    close();
+                    return true;
+                }
+                serialReader.Close();
+                close();
+                return false;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
+        }
+
+        public int insertarMovArticulo(Usuario user, String observaciones)
+        {
+            try
+            {
+                String codComprobante = "";
+                String nroComCompleto = "";
+                int nroComprobante = 0;
+                int id = 0;
+                open();
+                String sqlQuery = "select next value for GEN_NUM_MOV_ARTICULOS from RDB$DATABASE";
+                FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+                FbDataReader idReader = sqlCommand.ExecuteReader();
+
+                while (idReader.Read())
+                {
+                    id = idReader.GetInt32(0);
+                }
+                idReader.Close();
+
+                nroComprobante = obtenerNumeroComprobante();
+                codComprobante = obtenerCodigoComprobante();
+
+                nroComCompleto = "0001" + Convert.ToString(nroComprobante) + "0000X";
+
+
+                FbTransaction insertTransaction = connection.BeginTransaction();
+                FbCommand insertCommand = new FbCommand();
+                insertCommand.CommandText = "insert into MOV_ARTICULOS (NROINT,FECHA,COMPRO,NROCOM,DEPOSI,OBSERV,RESPON,NROCON,INTDEP,NRODEP) values" +
+                    " (" + id + "," + "CURRENT_TIMESTAMP" + ",'" + codComprobante + "','" + nroComCompleto + "',"
+                    + user.deposito + ",'" + observaciones + "'," + user.idUsuario + "," + id + ","
+                    + id + "," + user.deposito + ")";
+                insertCommand.Connection = connection;
+                insertCommand.Transaction = insertTransaction;
+
+                insertCommand.ExecuteNonQuery();
+                insertTransaction.Commit();
+                insertCommand.Dispose();
+                close();
+                return id;
+            }
+            catch (Exception e)
+            {
+                return 0;
+                throw new Exception(e.Message.ToString());
+            }
+
+        }
+
+        public int insertarDetalleMovArticulo(int idMovArt, Item articulo)
+        {
+            try
+            {
+                int id = 0;
+                open();
+                String sqlQuery = "select next value for GEN_NUM_DET_MOV_ARTICULOS from RDB$DATABASE";
+                FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+                FbDataReader idReader = sqlCommand.ExecuteReader();
+
+                while (idReader.Read())
+                {
+                    id = idReader.GetInt32(0);
+                }
+                idReader.Close();
+
+                FbTransaction insertTransaction = connection.BeginTransaction();
+                FbCommand insertCommand = new FbCommand();
+                insertCommand.CommandText = "insert into DET_MOV_ARTICULOS (NUMERO,NROINT,ARTICU,CANTID,CTRCOM,TRANID,STKFIS) values" +
+                    " (" + id + "," + idMovArt + ",'" + articulo.codigoArticulo + "'," + articulo.cantidad + ","
+                    + id + "," + 0 + "," + 0 + ")";
+                insertCommand.Connection = connection;
+                insertCommand.Transaction = insertTransaction;
+
+                insertCommand.ExecuteNonQuery();
+                insertTransaction.Commit();
+                insertCommand.Dispose();
+                close();
+                return id;
+            }
+            catch (Exception e)
+            {
+                return 0;
+                throw new Exception(e.Message.ToString());
+            }
+        }
+
+        public int buscarIdSerial(long numero)
+        {
+            try
+            {
+                int id = 0;
+                open();
+                String sqlQuery = "SELECT NUMINT FROM SERIALES WHERE SERIAL=@SERIAL";
+                FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+                sqlCommand.Parameters.Add("@SERIAL", Convert.ToString(numero));
+                FbDataReader idReader = sqlCommand.ExecuteReader();
+
+                while (idReader.Read())
+                {
+                    id = idReader.GetInt32(0);
+                }
+                idReader.Close();
+                close();
+                return id;
+            }
+            catch (Exception e)
+            {
+                return 0;
+                throw new Exception(e.Message.ToString());
+            }
+        }
+
+        public Boolean insertarMovSerialesArt(int idMovDetArt, int idSerial)
+        {
+            try
+            {
+                open();
+                FbTransaction insertTransaction = connection.BeginTransaction();
+                FbCommand insertCommand = new FbCommand();
+                insertCommand.CommandText = "insert into MOVSERIALESART (MOVART,NROSER) values" +
+                    " (" + idMovDetArt + "," + idSerial + ")";
+                insertCommand.Connection = connection;
+                insertCommand.Transaction = insertTransaction;
+
+                insertCommand.ExecuteNonQuery();
+                insertTransaction.Commit();
+                insertCommand.Dispose();
+                close();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
+        }
+
+        public String obtenerCodigoComprobante()
+        {
+            String codComprobante = "";
+            String sqlQueryParam = "select TEXTO1 FROM PARAMETROS where CODIGO='COMPDROID'";
+            FbCommand sqlCommandParam = new FbCommand(sqlQueryParam, connection);
+            FbDataReader comprobanteReader = sqlCommandParam.ExecuteReader();
+
+            while (comprobanteReader.Read())
+            {
+                codComprobante = comprobanteReader.GetString(0);
+            }
+            comprobanteReader.Close();
+            return codComprobante;
+        }
+
+        public int obtenerNumeroComprobante()
+        {
+            int id = 0;
+            String nombreGenerador = "";
+            String sqlQueryParam = "select TEXTO2 FROM PARAMETROS where CODIGO='COMPDROID'";
+            FbCommand sqlCommandParam = new FbCommand(sqlQueryParam, connection);
+            FbDataReader comprobanteReader = sqlCommandParam.ExecuteReader();
+
+            while (comprobanteReader.Read())
+            {
+                nombreGenerador = comprobanteReader.GetString(0);
+            }
+
+            String sqlQuery = "select next value for " + nombreGenerador + " from RDB$DATABASE";
+            FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
+            FbDataReader idReader = sqlCommand.ExecuteReader();
+
+            while (idReader.Read())
+            {
+                id = idReader.GetInt32(0);
+            }
+            idReader.Close();
+
+            return id;
+        }
     }
 }

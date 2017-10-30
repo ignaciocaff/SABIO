@@ -12,5 +12,6 @@ namespace RestServiceSabio.Model
         public int estado { get; set; }
         public String nombre { get; set; }
         public int area { get; set; }
+        public int deposito { get; set; }
     }
 }
