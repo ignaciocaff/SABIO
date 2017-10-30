@@ -27,3 +27,20 @@ Se agrego la funcionalidad getComprobantes, para probarlo tienen que ejecutar el
 Y pegar a api/comprobantes/get/pepito
 
 Actualiza el estado del picking y si no existe en la tabla picking_user lo crea, con el nro de pick del comprobante y el id de usuario correspondiente al nombre "pepito".
+
+
+
+Se agrego la funcionalidad saveStock que recibe un comprobante, tengo que hacer algo de refactoring pero esta de mi lado. Anda todo, testie y graba perfecto 
+toda las tablas involucradas en el saveStock. Lo unico que tienen que tener en cuenta es que no puede haber seriales iguales dentro del objeto que mande
+(Nose si esto esta bien o no, segun lo que entendi yo del modelo tiene q ser de esa manera, despues lo discutimos. Si mandan seriales identicos explota, no llegue
+a ver porque y me tengo q ir)
+
+Para correrlo lo unico que tienen que hacer es estos dos insert:
+
+INSERT INTO PARAMETROS (EMPRES, CODIGO, DESCRI, BOOLE1) VALUES (1, 'PROVEE', 'Proveedor',1);
+
+INSERT INTO PARAMETROS (EMPRES, CODIGO, DESCRI, TEXTO1, TEXTO2) VALUES (1, 'COMPDROID', 'Parametro comprobante android','AJS', 'GEN_TAL58');
+
+OBVIAMENTE ADEMAS DE ESTO, TODO LO QUE JOSE PASO EN SU MOMENTO EN EL SCRIPT.SQL (QUE YA LO DEBERIAN TENER).
+
+
