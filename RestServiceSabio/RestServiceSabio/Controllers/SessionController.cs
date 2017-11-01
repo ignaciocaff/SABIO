@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RestServiceSabio.Data;
+using RestServiceSabio.Managers;
 using RestServiceSabio.Model;
 
 namespace RestServiceSabio.Controllers

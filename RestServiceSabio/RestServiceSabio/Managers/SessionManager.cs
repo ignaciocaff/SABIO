@@ -8,7 +8,7 @@ using RestServiceSabio.DbManager;
 using System.Data;
 using RestServiceSabio.Model;
 
-namespace RestServiceSabio.Data
+namespace RestServiceSabio.Managers
 {
     public class SessionManager : DbConnection
     {

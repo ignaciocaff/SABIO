@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using RestServiceSabio.DbManager;
 
-namespace RestServiceSabio.Data
+namespace RestServiceSabio.Managers
 {
     public class ComprobantesManager : DbConnection
     {
