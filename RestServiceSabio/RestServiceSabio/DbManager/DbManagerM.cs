@@ -1,5 +1,4 @@
-﻿using EntityFrameworkCore.FirebirdSql.Extensions;
-using FirebirdSql.Data.FirebirdClient;
+﻿using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
