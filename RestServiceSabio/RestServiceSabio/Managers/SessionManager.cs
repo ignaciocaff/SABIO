@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 using RestServiceSabio.DbManager;
-using System.Data;
 using RestServiceSabio.Model;
 
 namespace RestServiceSabio.Managers
