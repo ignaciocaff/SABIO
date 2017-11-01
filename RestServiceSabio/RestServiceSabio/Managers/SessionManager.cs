@@ -8,6 +8,9 @@ namespace RestServiceSabio.Managers
 {
     public class SessionManager : DbConnection
     {
+        private const String ANDROIDIN = "ANDROIDIN";
+        private const String ANDROIDOUT = "ANDROIDOUT";
+
         public List<Usuario> obtenerListadoUsuarios()
         {
             List<Usuario> listadoUsuarios = new List<Usuario>();
@@ -45,9 +48,9 @@ namespace RestServiceSabio.Managers
                 if (user.loginUsuario == usuario.loginUsuario)
                 {
                     //Modificar el atributo HABILI a 1
-                    modificarEstado(usuario, "ANDROIDIN");
+                    modificarEstado(usuario, ANDROIDIN);
                     //Loguear en LOGS
-                    auditoriaLog(usuario, "ANDROIDIN");
+                    auditoriaLog(usuario, ANDROIDIN);
                     return true;
                 }
             }
@@ -63,9 +66,9 @@ namespace RestServiceSabio.Managers
                 if (user.loginUsuario == usuario.loginUsuario)
                 {
                     //Modificar el atributo HABILI a 0
-                    modificarEstado(usuario, "ANDROIDOUT");
+                    modificarEstado(usuario, ANDROIDOUT);
                     //Loguear en LOGS
-                    auditoriaLog(usuario, "ANDROIDOUT");
+                    auditoriaLog(usuario, ANDROIDOUT);
                     return true;
                 }
             }
@@ -121,10 +124,10 @@ namespace RestServiceSabio.Managers
 
                 switch (operacion)
                 {
-                    case "ANDROIDIN":
+                    case ANDROIDIN:
                         updateCommand.Parameters.Add("@OP_ID", true);
                         break;
-                    case "ANDROIDOUT":
+                    case ANDROIDOUT:
                         updateCommand.Parameters.Add("@OP_ID", false);
                         break;
                 }
@@ -168,7 +171,7 @@ namespace RestServiceSabio.Managers
 
         public Usuario obtenerUsuarioCompleto(Usuario user)
         {
-            
+
             try
             {
                 Usuario usuarioDto = new Usuario();
