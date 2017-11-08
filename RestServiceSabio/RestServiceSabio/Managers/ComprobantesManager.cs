@@ -187,7 +187,7 @@ namespace RestServiceSabio.Managers
             }
             return stockCompleto;
         }
-        public Boolean insertarSeriales(long serial, String codArt)
+        public Boolean insertarSeriales(String serial, String codArt)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace RestServiceSabio.Managers
                 FbTransaction insertTransaction = connection.BeginTransaction();
                 FbCommand insertCommand = new FbCommand();
                 insertCommand.CommandText = "insert into SERIALES (NUMINT,SERIAL,CODART,PROVEE,GTACOM,GTAVTA) values" +
-                    " (" + id + ",'" + Convert.ToString(serial) + "','" + codArt + "'," + proveedor + "," + 0 + "," + 0 + ")";
+                    " (" + id + ",'" + serial + "','" + codArt + "'," + proveedor + "," + 0 + "," + 0 + ")";
                 insertCommand.Connection = connection;
                 insertCommand.Transaction = insertTransaction;
 
@@ -234,14 +234,14 @@ namespace RestServiceSabio.Managers
 
         }
 
-        public Boolean existeSerial(long serial)
+        public Boolean existeSerial(String serial)
         {
             try
             {
                 open();
                 String sqlQuery = "SELECT CODART FROM SERIALES WHERE SERIAL=@SERIAL";
                 FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
-                sqlCommand.Parameters.Add("@SERIAL", Convert.ToString(serial));
+                sqlCommand.Parameters.Add("@SERIAL", serial);
                 FbDataReader serialReader = sqlCommand.ExecuteReader();
 
                 while (serialReader.Read())
@@ -344,7 +344,7 @@ namespace RestServiceSabio.Managers
             }
         }
 
-        public int buscarIdSerial(long numero)
+        public int buscarIdSerial(String numero)
         {
             try
             {
@@ -352,7 +352,7 @@ namespace RestServiceSabio.Managers
                 open();
                 String sqlQuery = "SELECT NUMINT FROM SERIALES WHERE SERIAL=@SERIAL";
                 FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
-                sqlCommand.Parameters.Add("@SERIAL", Convert.ToString(numero));
+                sqlCommand.Parameters.Add("@SERIAL", numero);
                 FbDataReader idReader = sqlCommand.ExecuteReader();
 
                 while (idReader.Read())
