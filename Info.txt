@@ -44,3 +44,40 @@ INSERT INTO PARAMETROS (EMPRES, CODIGO, DESCRI, TEXTO1, TEXTO2) VALUES (1, 'COMP
 OBVIAMENTE ADEMAS DE ESTO, TODO LO QUE JOSE PASO EN SU MOMENTO EN EL SCRIPT.SQL (QUE YA LO DEBERIAN TENER).
 
 
+To do: (Luego de la reunion Demo)
+
+-Arreglar funcionamiento MOVSERIALESART -- Hecho
+
+- Modificar PARAMETROS para que comiencen todo con la misma letra (modificar codigo) Hecho
+Los parametros ahora se llaman:
+DROIDCOMP y DROIDPROVE (Tienen que modificarlos para que les funcione en su tabla PARAMETROS del modelo.
+
+- Agregar el commmit al save stock
+Consulta, el stock commit dice "Cambia el codigo del comprobante.", el codigo del comprobante que estamos
+usando es un parametro en este caso AJS, yo deberia cambiar el codigo de MOV_ARTICULOS mas precisamente
+la columna COMPRO, pero que codigo le pongo para cuando hace el commit de stock? 
+
+- Metodo para saber si hay update o no, y creacion del parametro para esta funcion
+
+Creacion del parametro: insert into parametros (EMPRES,CODIGO,DESCRI,BOOLE1) VALUES
+(1,'DROIDUPDAT','Update de Articulos para App Android',0);
+
+0 significa que no hay updates, 1 que si. Ese valor lo modifican ellos. (Es un parametro)
+
+Para pegar a la API que te va a devolver true o false, true (Si hay updates pendientes , aca deberian mostrar "Hay updates pendientes" y forzarlos a apretar el boton para updatear), false ( Yo no mostraria nada).
+
+la URI es: http://localhost:52008/api/updates/pendientes
+
+- Metodo para buscar los articulos (SP hecho por jose, por el momento select a tabla articulos con todo.)
+Aca tenemos 2 opciones, que ustedes chequeen si obtienen la tabla articulos y entonces me manden a otra URI
+para q yo cambie el DROIDUPDAT a 0, o que lo haga yo, si veo que la informacion es correcta en el mismo metodo
+donde hago el select a todos los articulos. Por el momento lo hago yo. Despues lo definimos
+
+De momento solo les devuelvo Codigo y descripcion del articulo, para que no sea tan lento. Despues tienen que decirme si necesitan algo mas.
+La URI es : http://localhost:52008/api/updates/articulos
+
+Lo que devuelve es un listado de objetos articulos, que en este momento tiene 2 atributos.. Codigo y descripcion
+
+
+
+
