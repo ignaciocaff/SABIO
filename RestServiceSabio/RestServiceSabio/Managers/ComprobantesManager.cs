@@ -204,7 +204,7 @@ namespace RestServiceSabio.Managers
                 }
                 idReader.Close();
 
-                String sqlQueryParam = "select BOOLE1 FROM PARAMETROS where CODIGO='PROVEE'";
+                String sqlQueryParam = "select BOOLE1 FROM PARAMETROS where CODIGO='DROIDPROVE'";
                 FbCommand sqlCommandParam = new FbCommand(sqlQueryParam, connection);
                 FbDataReader provedorReader = sqlCommandParam.ExecuteReader();
 
@@ -397,7 +397,7 @@ namespace RestServiceSabio.Managers
         public String obtenerCodigoComprobante()
         {
             String codComprobante = "";
-            String sqlQueryParam = "select TEXTO1 FROM PARAMETROS where CODIGO='COMPDROID'";
+            String sqlQueryParam = "select TEXTO1 FROM PARAMETROS where CODIGO='DROIDCOMP'";
             FbCommand sqlCommandParam = new FbCommand(sqlQueryParam, connection);
             FbDataReader comprobanteReader = sqlCommandParam.ExecuteReader();
 
@@ -413,7 +413,7 @@ namespace RestServiceSabio.Managers
         {
             int id = 0;
             String nombreGenerador = "";
-            String sqlQueryParam = "select TEXTO2 FROM PARAMETROS where CODIGO='COMPDROID'";
+            String sqlQueryParam = "select TEXTO2 FROM PARAMETROS where CODIGO='DROIDCOMP'";
             FbCommand sqlCommandParam = new FbCommand(sqlQueryParam, connection);
             FbDataReader comprobanteReader = sqlCommandParam.ExecuteReader();
 

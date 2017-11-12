@@ -67,5 +67,8 @@ namespace RestServiceSabio.Entities
         [Column("CODAFI")]
         [StringLength(10)]
         public string Codafi { get; set; }
+        [Column("DESCRI")]
+        [StringLength(250)]
+        public string Descri { get; set; }
     }
 }
