@@ -79,5 +79,10 @@ La URI es : http://localhost:52008/api/updates/articulos
 Lo que devuelve es un listado de objetos articulos, que en este momento tiene 2 atributos.. Codigo y descripcion
 
 
+Entrada/Salida
+La URI Es:
+http://localhost:52008/api/entradasalida/ingresar/pistola
 
+y lo que mandan es un objeto comprobante, igual que el que reciben en getComprobante, pero con el numero de serial
+llenado.
 
