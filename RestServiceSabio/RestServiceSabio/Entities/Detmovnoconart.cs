@@ -18,6 +18,8 @@ namespace RestServiceSabio.Entities
         public int Numint { get; set; }
         [Column("NUMERO")]
         public int Numero { get; set; }
+        [Column("CANTID")]
+        public double Cantid { get; set; }
         [Column("ORDEN")]
         public short? Orden { get; set; }
         [Column("CODART")]
@@ -50,6 +52,8 @@ namespace RestServiceSabio.Entities
         public short? Priori { get; set; }
         [Column("LISPRE")]
         public short Lispre { get; set; }
+        [Column("PRESEN")]
+        public double Presen { get; set; }
 
         [InverseProperty("NumintNavigation")]
         public ICollection<Detconxnoconxart> Detconxnoconxart { get; set; }

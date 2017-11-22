@@ -3,11 +3,16 @@ using System;
 using System.Collections.Generic;
 using FirebirdSql.Data.FirebirdClient;
 using RestServiceSabio.DbManager;
+using RestServiceSabio.Entities;
+using System.Linq;
+using System.Collections;
+using Microsoft.EntityFrameworkCore;
 
 namespace RestServiceSabio.Managers
 {
     public class ComprobantesManager : DbConnection
     {
+        SabioDbContext context = new SabioDbContext();
         public Comprobante obtenerComprobante(Usuario user)
         {
             Comprobante comprobante = new Comprobante();
@@ -187,6 +192,195 @@ namespace RestServiceSabio.Managers
             }
             return stockCompleto;
         }
+
+        public Boolean guardarComprobanteES(Usuario user, Comprobante stock)
+        {
+            Boolean stockCompleto = false;
+            Comprobante stockDto = new Comprobante();
+            List<Item> articulos = new List<Item>();
+            try
+            {
+                stockDto.numeroPick = stock.numeroPick;
+                stockDto.observaciones = stock.observaciones;
+                stockDto.orden = stock.orden;
+                stockDto.puedeUsuario = stock.puedeUsuario;
+                foreach (Item articuloL in stock.items)
+                {
+
+                    Item articulo = new Item();
+                    List<Serial> seriales = new List<Serial>();
+                    articulo.descripcion = articuloL.descripcion;
+                    articulo.codigoArticulo = articuloL.codigoArticulo;
+                    articulo.cantidad = articuloL.cantidad;
+                    articulo.kilos = articuloL.kilos;
+                    articulo.unidad = articuloL.unidad;
+                    articulo.saldo = articuloL.saldo;
+                    foreach (Serial serial in articuloL.seriales)
+                    {
+                        MovContable movC = new MovContable();
+                        Serial s = new Serial();
+                        s.numero = serial.numero;
+                        //Chequeo previo si el serial ya existe en la tabla SERIALES
+                        if (!existeSerial(s.numero))
+                        {
+                            //Insert de los seriales en la BD
+                            insertarSeriales(s.numero, articulo.codigoArticulo);
+                        }
+                        s.idSerial = buscarIdSerial(s.numero);
+                        seriales.Add(s);
+                    }
+                    articulo.seriales = seriales;
+                    articulos.Add(articulo);
+
+
+                    var query = (from a in context.Detmovnoconart
+                                 join b in context.Movnocontables on a.Numero equals b.Numint
+                                 join c in context.PickingNocon on b.Numint equals c.Nocont
+                                 join f in context.Picking on c.Nropic equals f.Numint
+                                 where a.Codart == articulo.codigoArticulo && c.Nropic == stockDto.numeroPick
+                                 select new
+                                 {
+                                     Numero = a.Numint,
+                                     Cantidad = a.Cantid,
+                                     MovCon = a.Numero
+
+                                 }).ToList();
+
+                    List<Serial> listaSerialesMovNoCon = articulo.seriales;
+                    foreach (var e in query)
+                    {
+                        int hasta = Convert.ToInt32(e.Cantidad);
+                        List<Serial> serialesInsertar = listaSerialesMovNoCon.Take(hasta).ToList();
+
+                        foreach (Serial s in serialesInsertar)
+                        {
+                            int chequeoIdSerial = context.Movserialesnocon.Where(x => x.Nroser == s.idSerial).Select(y => y.Nroser).FirstOrDefault();
+                            if (e.Numero != 0 && chequeoIdSerial == 0)
+                            {
+                                insertarMovSerialesNoCon(e.Numero, s.idSerial);
+
+                            }
+                            listaSerialesMovNoCon.Remove(s);
+
+                            double cantidad = 0, presen = 0;
+                            if (s.numero.Length == 26)
+                            {
+                                if (articuloL.unidad == 1)
+                                {
+                                    cantidad = articuloL.kilos;
+                                    presen = e.Cantidad;
+
+                                }
+                                else
+                                {
+                                    cantidad = e.Cantidad;
+                                    presen = articuloL.kilos;
+                                }
+                                actualizarKilosDetmovNoCont(e.Numero, cantidad, presen);
+
+                            }
+
+                        }
+                        actualizarEstadoMovNoCon(e.MovCon);
+                    }
+                }
+                stockDto.items = articulos;
+                stockCompleto = true;
+                actualizarEstadoPicking(stockDto.numeroPick, 3);
+                return stockCompleto;
+            }
+            catch (Exception e)
+            {
+                e.Message.ToString();
+                e.StackTrace.ToString();
+                return stockCompleto;
+            }
+
+        }
+
+        public Boolean actualizarKilosDetmovNoCont(int idMovNoCon, double cantidad, double presen)
+        {
+            try
+            {
+                context.Detmovnoconart.Where(x => x.Numint == idMovNoCon).ToList().ForEach(y => y.Cantid = cantidad);
+                context.Detmovnoconart.Where(x => x.Numint == idMovNoCon).ToList().ForEach(y => y.Presen = presen);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString(), e.InnerException);
+            }
+        }
+        public Boolean actualizarEstadoPicking(int? numeroPick, int estado)
+        {
+            try
+            {
+                context.Picking.Where(x => x.Numint == numeroPick).ToList().ForEach(y => y.Estado = estado);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString(), e.InnerException);
+            }
+        }
+
+        public Boolean actualizarEstadoMovNoCon(int numeroMovNoCon)
+        {
+            try
+            {
+                context.Movnocontables.Where(x => x.Numint == numeroMovNoCon).ToList().ForEach(y => y.Estado = 2);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString(), e.InnerException);
+            }
+
+        }
+
+        public Boolean esNoContable(int noCont)
+        {
+            int numero = context.Detmovnoconart.First(x => x.Numero == noCont).Numero;
+            Boolean esNoCont = false;
+            if (!String.IsNullOrEmpty(numero.ToString()) && numero > 0)
+            {
+                esNoCont = true;
+            }
+            return esNoCont;
+        }
+
+        public Boolean insertarMovSerialesNoCon(int noCont, int idSerial)
+        {
+            try
+            {
+                /*Movserialesnocon movNoCont = new Movserialesnocon();
+                movNoCont.Nocont = noCont;
+                movNoCont.Nroser = idSerial;
+                context.Movserialesnocon.Add(movNoCont);
+                context.SaveChanges();*/
+                open();
+                FbTransaction insertTransaction = connection.BeginTransaction();
+                FbCommand insertCommand = new FbCommand();
+                insertCommand.CommandText = "insert into MOVSERIALESNOCON (NOCONT,NROSER) values" +
+                    " (" + noCont + "," + idSerial + ")";
+                insertCommand.Connection = connection;
+                insertCommand.Transaction = insertTransaction;
+
+                insertCommand.ExecuteNonQuery();
+                insertTransaction.Commit();
+                insertCommand.Dispose();
+                close();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message.ToString(), e.InnerException);
+            }
+            return true;
+        }
+
         public Boolean insertarSeriales(String serial, String codArt)
         {
             try
