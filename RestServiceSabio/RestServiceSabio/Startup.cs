@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RestServiceSabio.Schedules;
 
 namespace RestServiceSabio
 {
@@ -16,6 +17,7 @@ namespace RestServiceSabio
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            JobScheduler.Start();
         }
 
         public IConfiguration Configuration { get; }
