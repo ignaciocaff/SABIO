@@ -95,7 +95,7 @@ namespace RestServiceSabio.Managers
             try
             {
                 int id = 0;
-                String observaciones = "Marca: " + datosLog.marca_dispositivo + " Modelo: " + datosLog.modelo_dispositivo + " Bateria: " + datosLog.porcentaje_bateria + "%" + " Ubicacion: " + datosLog.ubicacion;
+                String observaciones = "Marca: " + datosLog.marca_dispositivo + " Modelo: " + datosLog.modelo_dispositivo + " Bateria: " + datosLog.porcentaje_bateria + "%";
                 open();
                 String sqlQuery = "select next value for GEN_LOG from RDB$DATABASE";
                 FbCommand sqlCommand = new FbCommand(sqlQuery, connection);
@@ -110,7 +110,7 @@ namespace RestServiceSabio.Managers
                 FbTransaction insertTransaction = connection.BeginTransaction();
                 FbCommand insertCommand = new FbCommand();
                 insertCommand.CommandText = "insert into LOGS (NUMERO,CASOUS,FECHA,USUARI,OBSERV,WINUSE,WINNET) values" +
-                    " (" + id + ",'" + operacion + "'," + "CURRENT_TIMESTAMP" + "," + user.idUsuario + ",'" + observaciones + "'," + "'USUARIO'" + "," + "'APPMOVIL'" + ")";
+                    " (" + id + ",'" + operacion + "'," + "CURRENT_TIMESTAMP" + "," + user.idUsuario + ",'" + observaciones + "'," + "'USUARIO'" + ",'" + datosLog.ubicacion + "')";
                 insertCommand.Connection = connection;
                 insertCommand.Transaction = insertTransaction;
 
