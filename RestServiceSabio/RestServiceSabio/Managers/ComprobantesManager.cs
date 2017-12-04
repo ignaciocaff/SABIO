@@ -28,22 +28,25 @@ namespace RestServiceSabio.Managers
 
                 while (comprobantesReader.Read())
                 {
-                    Item item = new Item();
+                    if (comprobantesReader.GetDouble(7) > 0)
+                    {
+                        Item item = new Item();
 
-                    comprobante.numeroPick = comprobantesReader.GetInt32(0);
-                    comprobante.orden = comprobantesReader.GetInt32(1);
-                    comprobante.observaciones = comprobantesReader.GetString(2);
-                    comprobante.puedeUsuario = comprobantesReader.GetInt32(3);
+                        comprobante.numeroPick = comprobantesReader.GetInt32(0);
+                        comprobante.orden = comprobantesReader.GetInt32(1);
+                        comprobante.observaciones = comprobantesReader.GetString(2);
+                        comprobante.puedeUsuario = comprobantesReader.GetInt32(3);
 
-                    item.codigoArticulo = comprobantesReader.GetString(4);
-                    item.descripcion = comprobantesReader.GetString(5);
-                    item.unidad = comprobantesReader.GetInt32(6);
-                    item.cantidad = comprobantesReader.GetDouble(7);
-                    item.kilos = comprobantesReader.GetDouble(8);
-                    item.puedePickear = comprobantesReader.GetDouble(9);
-                    item.saldo = comprobantesReader.GetDouble(10);
+                        item.codigoArticulo = comprobantesReader.GetString(4);
+                        item.descripcion = comprobantesReader.GetString(5);
+                        item.unidad = comprobantesReader.GetInt32(6);
+                        item.cantidad = comprobantesReader.GetDouble(7);
+                        item.kilos = comprobantesReader.GetDouble(8);
+                        item.puedePickear = comprobantesReader.GetDouble(9);
+                        item.saldo = comprobantesReader.GetDouble(10);
 
-                    listadoItems.Add(item);
+                        listadoItems.Add(item);
+                    }
                 }
                 foreach (Item it in listadoItems)
                 {
